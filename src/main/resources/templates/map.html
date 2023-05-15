@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kakao Maps Example</title>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_MAPS_API_KEY"></script>
+</head>
+<body>
+<form th:action="@{/map}" method="post">
+    <input type="text" name="address" placeholder="Enter address">
+    <button type="submit">Search</button>
+</form>
+
+<div id="map" style="width: 500px; height: 400px;"></div>
+
+<script th:inline="javascript">
+    var mapContainer = document.getElementById('map');
+    var mapOption = {
+        center: new kakao.maps.LatLng([[${latitude}]], [[${longitude}]]),
+        level: 3
+    };
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+</script>
+</body>
+</html>
