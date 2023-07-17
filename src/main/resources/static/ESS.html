@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ESS 충전소 위치</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      width: 100%;
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+  function initMap() {
+    // 맵 초기화
+    var map = new kakao.maps.Map(document.getElementById('map'), {
+      center: new kakao.maps.LatLng(37.5665, 126.9780), // 초기 지도 중심 위치
+      level: 8 // 초기 지도 확대 레벨
+    });
+
+    // 공공데이터 API에서 충전소 데이터 가져오기
+    var apiUrl = 'https://api.data.go.kr';
+    var serviceKey = '발급받은_서비스_키를_입력하세요';
+    var apiEndpoint = apiUrl + '/15000302/v1/ChargerService1/charger?serviceKey=' + serviceKey + '&numOfRows=1000&pageNo=1';
+
+    fetch(apiEndpoint)
+            .then(function(response) {
+              return response.json();
+            })
+            .then(function(data) {
+              var chargers = data.ChargerService1.row;
+
+              for (var i = 0; i < chargers.length; i++) {
+                var charger = chargers[i];
+                var lat = parseFloat(charger.lat);
+                var lng = parseFloat(charger.lng);
+
+                // 충전소 위치를 마커로 표시
+                var marker = new kakao.maps.Marker({
+                  position: new kakao.maps.LatLng(lat, lng),
+                  map: map
+                });
+              }
+            })
+            .catch(function(error) {
+              console.log('API 호출 오류:', error);
+            });
+  }
+</script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2b2ba43ff97debee6cac05661ea1bb2a&libraries=services&autoload=false"></script>
+<script>
+  kakao.maps.load(function() {
+    initMap();
+  });
+</script>
+</body>
+</html>

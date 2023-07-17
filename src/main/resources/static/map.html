@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>지도 페이지</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #62a86f, #54955e);
+        }
+
+        #map {
+            width: 600px;
+            height: 400px;
+            margin: 20px auto;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .send-location-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #62a86f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .send-location-button:hover {
+            background-color: #54955e;
+        }
+
+        .location-info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<div class="button-container">
+    <button class="send-location-button">ESS 충전소 위치</button>
+</div>
+<div class="location-info">
+    <p id="location-text"></p>
+</div>
+
+<script>
+    function initMap() {
+        // 맵 초기화
+        var map = new kakao.maps.Map(document.getElementById('map'), {
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // 초기 지도 중심 위치
+            level: 13 // 초기 지도 확대 레벨
+        });
+
+        // 버튼 클릭 시 현재 위치 보내기
+        var sendLocationButton = document.querySelector('.send-location-button');
+        sendLocationButton.addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude; // 현재 위치의 위도
+                    var lng = position.coords.longitude; // 현재 위치의 경도
+
+                    // 좌표를 마커로 표시
+                    var marker = new kakao.maps.Marker({
+                        position: new kakao.maps.LatLng(lat, lng),
+                        map: map
+                    });
+
+                    // 지도 중심 위치를 현재 위치로 이동
+                    map.setCenter(new kakao.maps.LatLng(lat, lng));
+
+                    // 위치 정보 출력
+                    var locationText = document.getElementById('location-text');
+                    locationText.textContent = '현재 위치: ' + lat + ', ' + lng;
+
+                    // 현재 위치 정보를 JSON으로 전송
+                    var data = {
+                        latitude: lat,
+                        longitude: lng
+                    };
+
+                    fetch('/ESS', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(function(response) {
+                            // 응답 처리
+                        })
+                        .catch(function(error) {
+                            // 오류 처리
+                        });
+                });
+            } else {
+                alert('Geolocation을 지원하지 않는 브라우저입니다.');
+            }
+        });
+    }
+</script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2b2ba43ff97debee6cac05661ea1bb2a&libraries=services&autoload=false"></script>
+<script>
+    kakao.maps.load(function() {
+        initMap();
+    });
+</script>
+</body>
+</html>
